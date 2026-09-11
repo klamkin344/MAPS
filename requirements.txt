@@ -1,6 +1,6 @@
 setuptools>=68
 wheel 
-numpy>=1.26  
+numpy>=1.25  
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 prettymaps==1.3.0

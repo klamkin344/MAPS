@@ -6,4 +6,5 @@ prettymaps==1.3.0
 osmnx==1.9.3
 matplotlib
 vsketch
+vpype<1.14
 python-multipart==0.0.9

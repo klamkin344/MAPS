@@ -1,0 +1,7 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+prettymaps==1.3.0
+osmnx==1.9.4
+matplotlib==3.9.2
+vsketch==1.1.0
+python-multipart==0.0.9

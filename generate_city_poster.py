@@ -35,7 +35,7 @@ import prettymaps
 # way to tell what's wrong. 60s is generous for a single map; if it's still
 # too slow, that itself is useful information (Overpass may be overloaded -
 # consider a smaller radius or retrying later).
-ox.settings.timeout = 60
+ox.settings.timeout = 90
 
 
 # ---------------------------------------------------------------------------
@@ -71,6 +71,76 @@ STYLE_PRESETS = {
 }
 
 
+def _add_labels(ax, city: str, radius_m: int, text_color: str) -> None:
+    """
+    Overlay street names for major roads and names for notable landmarks
+    (parks, squares, historic sites, tourism spots) on top of the already
+    drawn map. Uses osmnx to fetch named features and places small text
+    labels at their centroid. Failures here are non-fatal - a poster
+    without labels is still better than no poster, so problems are logged
+    and swallowed rather than crashing the whole job.
+    """
+    try:
+        center = ox.geocode(city)
+    except Exception as exc:
+        print(f"[generate_poster] label geocode failed: {exc}", flush=True)
+        return
+
+    # Major named streets: motorway/trunk/primary/secondary carry the
+    # important through-roads a viewer would actually recognize.
+    try:
+        streets = ox.features_from_point(
+            center, dist=radius_m,
+            tags={"highway": ["motorway", "trunk", "primary", "secondary"]},
+        )
+        streets = streets[streets.get("name").notna()] if "name" in streets else streets.iloc[0:0]
+        seen_names = set()
+        for _, row in streets.iterrows():
+            name = row.get("name")
+            if not name or name in seen_names:
+                continue
+            seen_names.add(name)
+            geom = row.geometry
+            pt = geom.centroid
+            ax.text(
+                pt.x, pt.y, name,
+                fontsize=6, color=text_color, alpha=0.85,
+                ha="center", va="center", zorder=10,
+                fontfamily="sans-serif",
+            )
+    except Exception as exc:
+        print(f"[generate_poster] street labels skipped: {exc}", flush=True)
+
+    # Landmarks: parks, squares, historic sites, and tourism attractions -
+    # the kind of named places someone orients themselves by.
+    try:
+        landmarks = ox.features_from_point(
+            center, dist=radius_m,
+            tags={
+                "leisure": ["park"],
+                "tourism": True,
+                "historic": True,
+                "place": ["square"],
+            },
+        )
+        landmarks = landmarks[landmarks.get("name").notna()] if "name" in landmarks else landmarks.iloc[0:0]
+        seen_names = set()
+        for _, row in landmarks.iterrows():
+            name = row.get("name")
+            if not name or name in seen_names:
+                continue
+            seen_names.add(name)
+            pt = row.geometry.centroid
+            ax.text(
+                pt.x, pt.y, name,
+                fontsize=7, color=text_color, alpha=0.95,
+                ha="center", va="center", zorder=11,
+                fontfamily="sans-serif", fontweight="bold",
+            )
+    except Exception as exc:
+        print(f"[generate_poster] landmark labels skipped: {exc}", flush=True)
+
+
 def generate_poster(
     city: str,
     style: str = "minimal_light",
@@ -79,6 +149,7 @@ def generate_poster(
     dpi: int = 300,
     caption: str | None = None,
     output_dir: str = "output",
+    label_places: bool = True,
 ) -> str:
     """
     Generate a poster-style map PNG for `city` and save it to disk.
@@ -113,6 +184,12 @@ def generate_poster(
         style=STYLE_PRESETS[style],
     )
     print(f"[generate_poster] OSM fetch + draw done in {time.time() - t0:.1f}s", flush=True)
+
+    if label_places:
+        print("[generate_poster] adding street/landmark labels...", flush=True)
+        t1 = time.time()
+        _add_labels(ax, city, radius_m, text_color=STYLE_PRESETS[style]["streets"]["fc"])
+        print(f"[generate_poster] labels done in {time.time() - t1:.1f}s", flush=True)
 
     # Optional caption under the map (city name + custom subtitle),
     # this is the "personalization" that lets you upsell per-order.

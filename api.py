@@ -78,6 +78,7 @@ class StatusResponse(BaseModel):
 
 
 def _run_generation(job_id: str, req: GenerateRequest, base_url: str) -> None:
+    print(f"[job {job_id}] starting: city={req.city!r} style={req.style} radius={req.radius_m}", flush=True)
     try:
         path = generate_poster(
             city=req.city,
@@ -94,7 +95,11 @@ def _run_generation(job_id: str, req: GenerateRequest, base_url: str) -> None:
             "url": f"{base_url}/files/{filename}",
             "error": None,
         }
+        print(f"[job {job_id}] done: {filename}", flush=True)
     except Exception as exc:  # noqa: BLE001 - surface any failure to the client
+        import traceback
+        print(f"[job {job_id}] FAILED: {exc}", flush=True)
+        traceback.print_exc()
         JOBS[job_id] = {"status": "failed", "url": None, "error": str(exc)}
 
 

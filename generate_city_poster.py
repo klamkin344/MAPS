@@ -23,10 +23,19 @@ reference implementation to deploy elsewhere.
 
 import argparse
 import os
+import time
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import osmnx as ox
 import prettymaps
+
+# Without this, a stalled/slow response from the Overpass API (OpenStreetMap's
+# query backend) can hang the whole request indefinitely with no error and no
+# way to tell what's wrong. 60s is generous for a single map; if it's still
+# too slow, that itself is useful information (Overpass may be overloaded -
+# consider a smaller radius or retrying later).
+ox.settings.timeout = 60
 
 
 # ---------------------------------------------------------------------------
@@ -93,6 +102,9 @@ def generate_poster(
 
     fig, ax = plt.subplots(figsize=(width_in, height_in))
 
+    print(f"[generate_poster] fetching OSM data for '{city}' (radius={radius_m}m)...", flush=True)
+    t0 = time.time()
+
     # Core call: prettymaps pulls streets/buildings/water/green space
     # from OpenStreetMap around the city center and renders them
     # with the chosen style layers.
@@ -114,6 +126,7 @@ def generate_poster(
         },
         style=STYLE_PRESETS[style],
     )
+    print(f"[generate_poster] OSM fetch + draw done in {time.time() - t0:.1f}s", flush=True)
 
     # Optional caption under the map (city name + custom subtitle),
     # this is the "personalization" that lets you upsell per-order.

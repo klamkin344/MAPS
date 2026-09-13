@@ -105,7 +105,7 @@ def generate_poster(
         radius=radius_m,
         layers={
             "perimeter": {},
-            "streets": {},
+            "streets": {"width": 1.5},
             "building": {"tags": {"building": True}, "union": False},
             "water": {"tags": {"natural": ["water", "bay"]}},
             "green": {"tags": {"landuse": "grass", "natural": ["wood", "island"]}},

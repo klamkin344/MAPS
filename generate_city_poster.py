@@ -47,10 +47,7 @@ STYLE_PRESETS = {
     "minimal_light": {
         "background": {"fc": "#F2F2F2", "zorder": -1},
         "perimeter": {"fc": "#F2F2F2", "ec": "#2F3737", "lw": 0},
-        "streets": {"fc": "#2F3737", "ec": "#2F3737", "lw": {
-            "motorway": 5, "trunk": 5, "primary": 4.5, "secondary": 4,
-            "tertiary": 3, "residential": 2, "service": 1,
-        }},
+        "streets": {"fc": "#2F3737", "ec": "#2F3737", "lw": 1.5},
         "building": {"fc": "#FFFFFF", "ec": "#2F3737", "lw": 0.5},
         "water": {"fc": "#A8C8D8", "ec": "#2F3737", "lw": 0},
         "green": {"fc": "#8BB174", "ec": "#2F3737", "lw": 0},
@@ -58,10 +55,7 @@ STYLE_PRESETS = {
     "dark_mode": {
         "background": {"fc": "#0B0B0F", "zorder": -1},
         "perimeter": {"fc": "#0B0B0F", "ec": "#0B0B0F", "lw": 0},
-        "streets": {"fc": "#F2C078", "ec": "#F2C078", "lw": {
-            "motorway": 5, "trunk": 5, "primary": 4.5, "secondary": 4,
-            "tertiary": 3, "residential": 2, "service": 1,
-        }},
+        "streets": {"fc": "#F2C078", "ec": "#F2C078", "lw": 1.5},
         "building": {"fc": "#1B1B23", "ec": "#F2C078", "lw": 0.3},
         "water": {"fc": "#12324A", "ec": "#12324A", "lw": 0},
         "green": {"fc": "#1D3324", "ec": "#1D3324", "lw": 0},
@@ -69,10 +63,7 @@ STYLE_PRESETS = {
     "warm_terracotta": {
         "background": {"fc": "#FBF1E6", "zorder": -1},
         "perimeter": {"fc": "#FBF1E6", "ec": "#5C3A21", "lw": 0},
-        "streets": {"fc": "#B5573A", "ec": "#B5573A", "lw": {
-            "motorway": 5, "trunk": 5, "primary": 4.5, "secondary": 4,
-            "tertiary": 3, "residential": 2, "service": 1,
-        }},
+        "streets": {"fc": "#B5573A", "ec": "#B5573A", "lw": 1.5},
         "building": {"fc": "#F0DCC4", "ec": "#5C3A21", "lw": 0.5},
         "water": {"fc": "#8FB8C9", "ec": "#5C3A21", "lw": 0},
         "green": {"fc": "#9CAF6B", "ec": "#5C3A21", "lw": 0},
@@ -114,12 +105,7 @@ def generate_poster(
         radius=radius_m,
         layers={
             "perimeter": {},
-            "streets": {
-                "width": {
-                    "motorway": 5, "trunk": 5, "primary": 4.5,
-                    "secondary": 4, "tertiary": 3, "residential": 2, "service": 1,
-                }
-            },
+            "streets": {},
             "building": {"tags": {"building": True}, "union": False},
             "water": {"tags": {"natural": ["water", "bay"]}},
             "green": {"tags": {"landuse": "grass", "natural": ["wood", "island"]}},
